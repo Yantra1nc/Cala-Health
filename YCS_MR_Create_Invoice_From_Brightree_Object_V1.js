@@ -40,8 +40,6 @@
           	log.debug('btSearchId : ',btSearchId);
           	var btTaxId = objScript.getParameter({name:'custscript_ch_bt_tax_id'});
           	log.debug('btTaxId : ',btTaxId);
-            var soInvLinkingItemId = objScript.getParameter({name:'custscript_ch_so_linking_item_id'});
-          	log.debug('soInvLinkingItemId : ',soInvLinkingItemId);
 
 			try{
 
@@ -73,7 +71,7 @@
 					//Check search result length
 					if(searchResult.length > 0){
 
-                      	var nextItemId = "", arItemId = "";
+                      	var nextItemId = "";
 
 						//Search Result loop
 						for(var p=0; p< searchResult.length; p++){
@@ -192,7 +190,7 @@
 							var itemName  = searchResult[p].getText({
 							   name: 'custrecord_ch_bt_itemid'
 							});
-							//log.debug('itemName :'+p,itemName);
+							log.debug('itemName :'+p,itemName);
 							//Get itemOldName
 							var itemOldName  = searchResult[p].getValue({
 							   name: 'custrecord_ch_bt_itemname'
@@ -241,24 +239,22 @@
                                 //arFlag		= true;
 								//itemId  	= recordItemObj[itemName];
                               	var itemData  = recordItemArr.filter(function (entry) { return entry.itemName === String(itemName); });
-								//log.debug('itemData input & length : ',itemData+' && '+itemData.length);
+								log.debug('itemData input & length : ',itemData+' && '+itemData.length);
 								if(itemData.length > 1){
 									itemId		= itemData[0]["itemId"];
 									nextItemId	= itemData[1]["itemId"];
-                                    arItemId    = arItemObj[itemName];
 								}else if(itemData.length > 0){
 									itemId		= itemData[0]["itemId"];
-                                    arItemId    = arItemObj[itemName];
 								}else if(itemData.length == 0){
                                     itemId      = arItemObj[itemName];
-                                    //log.debug('itemId in AR 0 : ',itemId);
+                                    log.debug('itemId in AR 0 : ',itemId);
                                     arFlag		= true;
                                 }
-                              	//log.debug('itemId & nextItemId input : ',itemId+' && '+nextItemId);
+                              	log.debug('itemId & nextItemId input : ',itemId+' && '+nextItemId);
             
                               	if(recType=='Write-Off' || recType=='Write-Off Allowable' || recType=='Adjust Allowable' || recType=='Credit Adjustment' || (recType=='Balance Transfer' && btAppliedToFrom=='')){
 									itemId  	= arItemObj[itemName];
-                                    //log.debug('itemId in AR : ',itemId);
+                                    log.debug('itemId in AR : ',itemId);
                                   	arFlag		= true;
 								}
                                 
@@ -266,19 +262,19 @@
 								if(tranDate){
 									var btTranDate	= parseAndFormatDateString(tranDate);
 									var febDate6	= new Date('2/6/2023');
-									//log.debug('btTranDate & febDate6 :',btTranDate+' && '+febDate6);
+									log.debug('btTranDate & febDate6 :',btTranDate+' && '+febDate6);
 
 									if(btTranDate < febDate6){
-                                      	//log.debug('less date');
+                                      	log.debug('less date');
 										if(!itemId){
 											itemName 	= cutOverItemObj[itemOldName];
-											//log.debug('cutover Item Name :',itemName);
+											log.debug('cutover Item Name :',itemName);
 										}
 										itemId  	= itemObj[itemName];
 									}else{
-                                      	//log.debug('greater date with itemName :',itemName);
+                                      	log.debug('greater date with itemName :',itemName);
 										itemId  	= arItemObj[itemName];
-                                      	//log.debug('itemId in condition : ',itemId);
+                                      	log.debug('itemId in condition : ',itemId);
                                       	arFlag		= true;
 									}
 								}else{
@@ -289,7 +285,7 @@
                           	if(recType=='Tax'){
                               	itemId  = btTaxId;
                                 //itemId  	= arItemObj[itemName];
-                                //log.debug('tax itemId : ',itemId);
+                                log.debug('tax itemId : ',itemId);
                             }
 
 							var btData = {
@@ -317,7 +313,6 @@
                               	"arFlag":arFlag,
 								"itemId":itemId,
                               	"nextItemId":nextItemId,
-                                "arItemId":arItemId,
                               	"itemName":itemName,
 								"itemQty":itemQty,
 								"itemRate":itemRate,
@@ -326,8 +321,7 @@
                               	"btPaymentType":btPaymentType,
                                 "btPaymentDate":btPaymentDate,
                                 "btInvCreatedDate":btInvCreatedDate,
-                                "arItemObj":arItemObj,
-                                "soInvLinkingItemId":soInvLinkingItemId
+                                "arItemObj":arItemObj
 							};
 
 							//btResultArr.push({"soRecId":soRecId,"btData":btData});
@@ -389,7 +383,6 @@
 				log.debug('context key btTranNo in reduce : ', btTranNo);
 				log.debug('context.values.length : ',context.values.length);
 
-                var soInvLinkingItemId = JSON.parse(context.values[0]).soInvLinkingItemId || "";
               	var btOrderId	= JSON.parse(context.values[0]).btOrderId || "";
 				var soRecId		= JSON.parse(context.values[0]).soRecId || "";
 				//log.debug('soRecId : ',soRecId);
@@ -428,7 +421,7 @@
 						if(btPaymentDate){
 							btPaymentDate= parseAndFormatDateString(btPaymentDate);
 						}
-                        //log.debug('btPaymentDate in reduce : ',btPaymentDate);
+                        log.debug('btPaymentDate in reduce : ',btPaymentDate);
 
                         var btInvCreatedDate= JSON.parse(context.values[a]).btInvCreatedDate;
 						if(btInvCreatedDate){
@@ -466,7 +459,6 @@
 						var btExtId		= JSON.parse(context.values[a]).btExtId;
 						var itemId		= JSON.parse(context.values[a]).itemId;
                       	var nextItemId	= JSON.parse(context.values[a]).nextItemId;
-                        var arItemId    = JSON.parse(context.values[a]).arItemId;//
                       	var itemName	= JSON.parse(context.values[a]).itemName;
 						var itemQty		= JSON.parse(context.values[a]).itemQty || 0;
 						var itemRate	= JSON.parse(context.values[a]).itemRate;
@@ -494,31 +486,30 @@
 							"btApplAmt":btApplAmt,
 							"btApplToFrom":btApplToFrom,
                             "btPaymentDate":btPaymentDate,
-                            "btInvCreatedDate":btInvCreatedDate,
-                            "soInvLinkingItemId":soInvLinkingItemId
+                            "btInvCreatedDate":btInvCreatedDate
 						}
 
 						if(recType=='Invoice'){
-							invLineItemArr.push({"btId":btId,"btExtId":btExtId,"arFlag":arFlag,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"tranDate":btDate,"btPaymentType":btPaymentType,"btTranType":recType});
+							invLineItemArr.push({"btId":btId,"btExtId":btExtId,"arFlag":arFlag,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"tranDate":btDate,"btPaymentType":btPaymentType});
 							invFlag = true;
 							//CreateInvoiceRecord(soRecId,customData,invLineItemArr);
 						}else if(recType=='Tax'){
 							if(itemAmt < 0){
-								taxNegLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btPaymentType":btPaymentType,"btTranType":recType});
-								CreateStandAloneCreditMemo(patientId,soRecId,customData,taxNegLineItemArr,arItemObj);
+								taxNegLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btPaymentType":btPaymentType});
+								CreateStandAloneCreditMemo(patientId,soRecId,customData,taxNegLineItemArr,arItemObj)
 							}
 							else if(itemAmt > 0){
-								taxPosLineItemArr.push({"btId":btId,"btExtId":btExtId,"btApplToFrom":btApplToFrom,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"tranDate":btDate,"btPaymentType":btPaymentType,"btTranType":recType});
+								taxPosLineItemArr.push({"btId":btId,"btExtId":btExtId,"btApplToFrom":btApplToFrom,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"tranDate":btDate,"btPaymentType":btPaymentType});
 								taxFlag = true;
 							}
 							//CreateInvoiceRecord(soRecId,customData,invLineItemArr);
 						}else if(recType=='Balance Transfer'){
 							//count++;
-							bltLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType,"btTranType":recType});
+							bltLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType});
                           if(itemAmt < 0){
-							bltNegLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType,"btTranType":recType});
+							bltNegLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType});
                           }else if(itemAmt > 0){
-                            bltPosLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType,"btTranType":recType});
+                            bltPosLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"tranDate":btDate,"btPaymentType":btPaymentType});
                           }
 							//blFlag = CreateCreditMemo(soRecId,customData,cmLineItemArr,count);
                           	//if(blFlag==true){
@@ -527,52 +518,49 @@
                           	blFlag=true;
 						}else if(recType=='Adjust Allowable'){
 							//count++;
-							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType,"btTranType":recType});
+							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType});
 							//CreateCreditMemo(soRecId,customData,cmLineItemArr);
                           	if(itemAmt < 0){
 								CreateStandAloneInvoiceRecord(soRecId,customData,cmLineItemArr);
 							}else if(itemAmt > 0){
-                              	//CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
-								CreateStandAloneCreditMemo(patientId,soRecId,customData,cmLineItemArr,arItemObj);
+                              	CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
                             }
 						}else if(recType=='Credit Adjustment'){
 							//count++;
-							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType,"btTranType":recType});
+							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType});
 							//CreateCreditMemo(soRecId,customData,cmLineItemArr);
                           	if(itemAmt < 0){
 								CreateStandAloneInvoiceRecord(soRecId,customData,cmLineItemArr);
 							}else if(itemAmt > 0){
-                              	//CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
-                                CreateStandAloneCreditMemo(patientId,soRecId,customData,cmLineItemArr,arItemObj);//new added
+                              	CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
                             }
-						}else if(recType=='Write-Off' || recType=='WriteOff' || recType=='Write-Off Allowable' || recType=='WriteOff Allowable'){
-							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType,"btTranType":recType});
+						}else if(recType=='Write-Off' || recType=='Write-Off Allowable' || recType=='WriteOff Allowable'){
+							cmLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":itemAmt,"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType});
 							//CreateCreditMemo(soRecId,customData,cmLineItemArr);
                           	if(itemAmt < 0){
 								CreateStandAloneInvoiceRecord(soRecId,customData,cmLineItemArr);
 							}else if(itemAmt > 0){
-                              	//CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
-                                CreateStandAloneCreditMemo(patientId,soRecId,customData,cmLineItemArr,arItemObj);//new added 21st Sept 2023
+                              	CreateCreditMemo(soRecId,customData,cmLineItemArr,arItemObj);
                             }
 						}
                       	else if(recType=='Applied Payment'){
-							appPaymentDataArr.push({"btId":btId,"btExtId":btExtId,"btAppliedToFrom":btApplToFrom,"btTranType":recType});
+							appPaymentDataArr.push({"btId":btId,"btExtId":btExtId,"btAppliedToFrom":btApplToFrom});
 							CreateCustomerPayment(soRecId,customData,appPaymentDataArr);
 						}
                       	else if(recType=='Payment'){
-							paymentDataArr.push({"btId":btId,"btExtId":btExtId,"btAppliedToFrom":btApplToFrom,"btTranType":recType});
+							paymentDataArr.push({"btId":btId,"btExtId":btExtId,"btAppliedToFrom":btApplToFrom});
 							CreateCustomerPayment(soRecId,customData,paymentDataArr);
 						}
                       	else if(recType=='Refund'){
                           	var refundFlag = false;
-							crLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"arItemId":arItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":Math.abs(itemAmt),"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType,"btTranType":recType});
+							crLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"nextItemId":nextItemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":Math.abs(itemAmt),"itemDesc":itemDesc,"btApplAmt":btApplAmt,"btPaymentType":btPaymentType});
 							//CreateCustomerRefund(soRecId,customData,btId,btExtId,btApplToFrom);
                           	if(btApplToFrom){
-								//refundFlag = CreateCustomerRefund(soRecId,customData,btId,btExtId,btApplToFrom);
-                              	//log.debug('refundFlag : ',refundFlag);
-                              	//if(refundFlag==false){
+								refundFlag = CreateCustomerRefund(soRecId,customData,btId,btExtId,btApplToFrom);
+                              	log.debug('refundFlag : ',refundFlag);
+                              	if(refundFlag==false){
 									CreateCreditMemo(soRecId,customData,crLineItemArr,arItemObj);
-								//}
+								}
 							}else{
 								//crLineItemArr.push({"btId":btId,"btExtId":btExtId,"itemId":itemId,"itemName":itemName,"itemQty":itemQty,"itemRate":itemRate,"itemAmt":Math.abs(itemAmt),"itemDesc":itemDesc,"btApplAmt":btApplAmt});
 								CreateCreditMemo(soRecId,customData,crLineItemArr,arItemObj);
@@ -583,9 +571,9 @@
 						if(a==context.values.length-1){
 
                           	var invRecId = 0, inv_BTDate = "", bl_BTDate = "";
-							//log.debug('invFlag & blFlag : ',invFlag +' & '+blFlag);
-                          	//log.debug('bltLineItemArr : ',bltLineItemArr);
-                            //log.debug('soRecId & arFlag : ',soRecId + ' & '+arFlag);
+							log.debug('invFlag & blFlag : ',invFlag +' & '+blFlag);
+                          	log.debug('bltLineItemArr : ',bltLineItemArr);
+                            log.debug('soRecId & arFlag : ',soRecId + ' & '+arFlag);
 							if(invFlag==true){
 
                                 for(var f=0; f<invLineItemArr.length; f++){
@@ -594,12 +582,11 @@
                                          break;
                                     }
                                 }
-                                //log.debug('revised arFlag : ',arFlag);
+                                log.debug('revised arFlag : ',arFlag);
 
 								if(soRecId !=""){
                                     if(arFlag==true){
-                                        //CreateStandAloneInvoiceRecord(soRecId,customData,invLineItemArr);
-                                        invRecId = CreateInvoiceRecord(soRecId,customData,invLineItemArr,arItemObj);
+                                        CreateStandAloneInvoiceRecord(soRecId,customData,invLineItemArr);
                                     }else{
                                         invRecId = CreateInvoiceRecord(soRecId,customData,invLineItemArr,arItemObj);
                                     }
@@ -613,32 +600,26 @@
 							}if(blFlag==true){
 
                               	bl_BTDate	= bltLineItemArr[0].tranDate;
-								//log.debug('bl_BTDate in final : ',bl_BTDate);
-                              	//log.debug('inv_BTDate in final : ',inv_BTDate);
-                              	//log.debug('invRecId in final : ',invRecId);
+								log.debug('bl_BTDate in final : ',bl_BTDate);
+                              	log.debug('inv_BTDate in final : ',inv_BTDate);
+                              	log.debug('invRecId in final : ',invRecId);
 
 								if(inv_BTDate==bl_BTDate && invRecId > 0){
 
-                                  	//log.debug('Update Invoice Start');
+                                  	log.debug('Update Invoice Start');
 									UpdateInvoice(invRecId,bltLineItemArr);
 
 								}else if(inv_BTDate!=bl_BTDate){
 
                                   	//for(var b=0; b < bltLineItemArr.length; b++){
-                                      	//log.debug('bltNegLineItemArr : ',bltNegLineItemArr);
-                                  		//log.debug('bltPosLineItemArr : ',bltPosLineItemArr);
+                                      	log.debug('bltNegLineItemArr : ',bltNegLineItemArr);
+                                  		log.debug('bltPosLineItemArr : ',bltPosLineItemArr);
                                       	if(bltNegLineItemArr.length > 0){
-                                          	//CreateBLInvoiceRecord(soRecId,customData,bltNegLineItemArr);
-                                            if(soRecId > 0){
-                                                CreateInvoiceRecord(soRecId,customData,bltNegLineItemArr,arItemObj);
-                                            }else{
-                                                CreateBLInvoiceRecord(soRecId,customData,bltNegLineItemArr);
-                                            }
+                                          	CreateBLInvoiceRecord(soRecId,customData,bltNegLineItemArr);
                                         }
                                       	if(bltPosLineItemArr.length > 0){
-                                          	//CreateCreditMemo(soRecId,customData,bltPosLineItemArr,arItemObj);
-											CreateStandAloneCreditMemo(patientId,soRecId,customData,bltPosLineItemArr,arItemObj);
-										}
+                                          	CreateCreditMemo(soRecId,customData,bltPosLineItemArr,arItemObj);
+                                        }
 
                                     //}
 
@@ -654,7 +635,7 @@
 								CreatecreditMemo(soRecId,customData,cmLineItemArr);
 							}*/
                           	if(taxFlag==true){
-								//log.debug("taxPosLineItemArr", JSON.stringify(taxPosLineItemArr));
+								log.debug("taxPosLineItemArr", JSON.stringify(taxPosLineItemArr));
 								AddInvoiceTaxLine(soRecId,taxPosLineItemArr, customData);
 							}
 						}
@@ -725,14 +706,14 @@
    		function AddInvoiceTaxLine(soRecId,lineItemArr, customData){
 			var flag = false, invRecId = "";
 			try{
-				//log.debug("Inside AddInvoiceTaxLine() lineItemArr", JSON.stringify(lineItemArr));
+				log.debug("Inside AddInvoiceTaxLine() lineItemArr", JSON.stringify(lineItemArr));
 				var btApplToFrom = lineItemArr[0].btApplToFrom || "";
-				//log.debug('btApplToFrom : ',btApplToFrom);
+				log.debug('btApplToFrom : ',btApplToFrom);
 				if(btApplToFrom){
 
 					invRecId = GetAppliedInvoice(btApplToFrom);
 				}
-				//log.debug('Add tax in invoice id : ',invRecId);
+				log.debug('Add tax in invoice id : ',invRecId);
 
 				//Commented By Asha on 02/02/2023
 				//if(invRecId == 0)
@@ -745,7 +726,7 @@
 					if(invRecId > 0){
 							log.debug("Successfully invoice record is created id with tax is : ",invRecId);
 							var currDate = new Date();
-							//log.debug('lineItemArr Tax :',lineItemArr);
+							log.debug('lineItemArr Tax :',lineItemArr);
 							for(var z=0; z < lineItemArr.length; z++){
 								var fldId = record.submitFields({
 									type: 'customrecord_ch_bt_staging',
@@ -846,7 +827,7 @@
 						flag = true;
 
 					}//End line item for loop
-					//log.debug('add tax inv flag : ',flag);
+					log.debug('add tax inv flag : ',flag);
 
 					if(flag==true){
 
@@ -855,7 +836,7 @@
 						if(invRecId > 0){
 							log.debug("Successfully updated invoice record id with tax is : ",invRecId);
 							var currDate = new Date();
-							//log.debug('lineItemArr Tax :',lineItemArr);
+							log.debug('lineItemArr Tax :',lineItemArr);
 							for(var z=0; z < lineItemArr.length; z++){
 								var fldId = record.submitFields({
 									type: 'customrecord_ch_bt_staging',
@@ -988,7 +969,7 @@
 					flag = true;
 
 				}//End line item for loop
-				//log.debug('stand alone tax inv flag : ',flag);
+				log.debug('stand alone tax inv flag : ',flag);
 
 				if(flag==true){
 
@@ -997,7 +978,7 @@
                     if(invRecId > 0){
                         log.debug("Successfully updated invoice record id is : ",invRecId);
                       	var currDate = new Date();
-                      	//log.debug('lineItemArr BL :',lineItemArr);
+                      	log.debug('lineItemArr BL :',lineItemArr);
                         for(var z=0; z < lineItemArr.length; z++){
                             var fldId = record.submitFields({
                                 type: 'customrecord_ch_bt_staging',
@@ -1045,15 +1026,12 @@
 
                 log.debug('Start Credit Memo');
                 log.debug('cmLineItemArr : ',cmLineItemArr);
-                var cmFlag = false, flag = false, cmItemIdArr = [];
-                var itemQtyObj  = new Object(), cmStandFlag = false;
-				//var soInvLinkingItemId = '4945';
-                var soInvLinkingItemId = customData.soInvLinkingItemId;
-                log.debug('CM soInvLinkingItemId : ',soInvLinkingItemId);
+                var cmFlag = false, flag = false;
+                var itemQtyObj  = new Object();
 
                 var tranDate	= customData.tranDate;
               	var dateOfService	= customData.dateOfService;
-                var btTranType	= cmLineItemArr[0].btTranType;//customData.btTranType;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
               	var btOrderId	= customData.btOrderId;//
                 var patientKey	= customData.patientKey;
@@ -1073,7 +1051,7 @@
                 var btPaymentDate= customData.btPaymentDate;
                 var btInvCreatedDate = customData.btInvCreatedDate;
 
-              	//log.debug('btApplToFrom : ',btApplToFrom);
+              	log.debug('btApplToFrom : ',btApplToFrom);
 				var invId		= "";
               	if(btApplToFrom){
                   	invId		= GetAppliedInvoice(btApplToFrom);
@@ -1092,11 +1070,11 @@
                     });
 
                     var invLoc = invRec.getValue({fieldId:'location'});
-                    //log.debug('invLoc : ',invLoc);
+                    log.debug('invLoc : ',invLoc);
 
                     //Get Item sublist Line count of an invoice
                     var invLineCount = invRec.getLineCount({sublistId: 'item'});
-                    //log.debug('invLineCount : ',invLineCount);
+                    log.debug('invLineCount : ',invLineCount);
 
                     for(var z=0; z<invLineCount; z++){
 
@@ -1121,7 +1099,7 @@
                             });
 
                             var invInvtDtlLineCount = subrec.getLineCount({sublistId: 'inventoryassignment'});
-                            //log.debug('invInvtDtlLineCount : ',invInvtDtlLineCount);
+                            log.debug('invInvtDtlLineCount : ',invInvtDtlLineCount);
 
                             for(var k=0; k < invInvtDtlLineCount; k++){
 
@@ -1142,7 +1120,7 @@
 
                     }//End for loop
 
-                    //log.debug('invItemDataArr : ',invItemDataArr);
+                    log.debug('invItemDataArr : ',invItemDataArr);
 
                     //Transform invoice to credit memo record
                     var cmRecord = record.transform({
@@ -1156,7 +1134,7 @@
 
                     //Get Item sublist Line count of credit memo
                     var cmLineCount = cmRecord.getLineCount({sublistId: 'item'});
-                    //log.debug('cmLineCount : ',cmLineCount);
+                    log.debug('cmLineCount : ',cmLineCount);
 
                     //Loop through all lines to set received item of credit memo
                     for(var p=cmLineCount-1; p > -1; p--){
@@ -1170,14 +1148,12 @@
                         //log.debug('line : ',line);
                         var itemId 		= cmRecord.getCurrentSublistValue({sublistId: 'item',fieldId: 'item'});
                         //log.debug('itemId Inv : ',itemId);
-                        var invBTId 	= cmRecord.getCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_internal_id'});
-                        //log.debug('invBTId : ',invBTId);
                         var invItemQty 	= cmRecord.getCurrentSublistValue({sublistId: 'item',fieldId: 'quantity'});
                         //log.debug('invItemQty : ',invItemQty);
                       	var invItemInvtDtl 	= cmRecord.getCurrentSublistValue({sublistId: 'item',fieldId: 'inventorydetailavail'});
                         //log.debug('invItemInvtDtl : ',invItemInvtDtl);
                         var lineData  	= cmLineItemArr.filter(function (entry) { return entry.itemId === itemId; });
-                        //log.debug('lineData Inv : ',lineData);
+                        log.debug('lineData Inv : ',lineData);
 
                         if(lineData.length > 0){
 
@@ -1194,7 +1170,7 @@
                                 itemQtyObj[itemId] = lineItemQty;
                             }
 							var memoAmount = Math.abs(parseFloat(lineData[0].btApplAmt));
-							//log.debug("memoAmount", memoAmount);
+							log.debug("memoAmount", memoAmount);
                             //cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: lineData[0].itemQty,ignoreFieldChange: false});
                             //cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'rate',value: lineData[0].itemRate,ignoreFieldChange: false});
                             //cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'amount',value: parseFloat(btApplAmt),ignoreFieldChange: false});
@@ -1284,18 +1260,10 @@
 
                             //commit sublist line item
                             cmRecord.commitLine({sublistId: 'item'});
-                            cmItemIdArr.push(itemId);
                             cmFlag = true;
                         }else{
-                            if(itemId==soInvLinkingItemId && btId==invBTId){
-							   cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: 1,ignoreFieldChange: false});
-							   //commit sublist line item
-							   cmRecord.commitLine({sublistId: 'item'});
-							   cmFlag = true;
-							}else{
-								log.debug('remove line no :',p);
-								cmRecord.removeLine({sublistId: 'item',line: p,ignoreRecalc: true});
-							}
+                            log.debug('remove line no :',p);
+                            cmRecord.removeLine({sublistId: 'item',line: p,ignoreRecalc: true});
                         }
 
                     }//End for loop of line item
@@ -1303,31 +1271,6 @@
                   	//Get Item sublist Line count of credit memo
                     var newCMLineCount = cmRecord.getLineCount({sublistId: 'item'});
                     log.debug('newCMLineCount : ',newCMLineCount);
-                    if(newCMLineCount==1){
-						for(var t=0; t<cmLineItemArr.length; t++){
-							//Select New Line
-							cmRecord.selectNewLine({sublistId: 'item'});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'item',value: cmLineItemArr[t].arItemId,ignoreFieldChange: false});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: cmLineItemArr[t].itemQty,ignoreFieldChange: false});
-							//cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'rate',value: lineItemArr[t].itemRate,ignoreFieldChange: false});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'amount',value: Math.abs(cmLineItemArr[t].itemAmt),ignoreFieldChange: true});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'description',value: cmLineItemArr[t].itemDesc,ignoreFieldChange: true});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_internal_id',value: cmLineItemArr[t].btId,ignoreFieldChange: true});
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_ext_id',value: cmLineItemArr[t].btExtId,ignoreFieldChange: true});
-
-							cmRecord.setCurrentSublistText({sublistId: 'item',fieldId: 'cseg_ch_payer',text: cmLineItemArr[t].btPaymentType,ignoreFieldChange: true});
-							if(tranDate){
-								cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_bt_tran_date_col',value: tranDate,ignoreFieldChange: true});//
-							}
-							cmRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_tran_type_line',value: btTranType,ignoreFieldChange: true});//
-
-							//commit sublist line item
-							cmRecord.commitLine({sublistId: 'item'});
-							cmItemIdArr.push(lineItemArr[t].arItemId);
-							btApplAmt = parseFloat(btApplAmt) + parseFloat(cmLineItemArr[t].btApplAmt);
-							cmFlag = true;
-						}
-					}
 
                   	if(newCMLineCount > 0){
                         var applyLineCount = cmRecord.getLineCount({sublistId: 'apply'});
@@ -1411,7 +1354,7 @@
 						});
                         */
 					}
-                    //log.debug('cmFlag :',cmFlag);
+                    log.debug('cmFlag :',cmFlag);
 
                 }//End invId
 				else{
@@ -1419,7 +1362,7 @@
 					//Start Standalone Credit Memo
 					//var itemObj		= customData.itemObj;
 					var customer	= GetCustomerByPatientId(patientId);
-					//log.debug('customer in CM : ',customer);
+					log.debug('customer in CM : ',customer);
 
 					//Create credit memo record
 					var cmRecord = record.create({
@@ -1430,7 +1373,7 @@
 						}
 					});
 
-					//log.debug('cmLineItemArr.length else : ',cmLineItemArr.length);
+					log.debug('cmLineItemArr.length else : ',cmLineItemArr.length);
 
 					for(var p=0; p < cmLineItemArr.length; p++){
 
@@ -1442,7 +1385,7 @@
 						//log.debug('itemAmt : ',itemAmt);
 
 						var itemId  = cmLineItemArr[p].itemId;
-						//log.debug('itemId : ',itemId);
+						log.debug('itemId : ',itemId);
 
 						if(itemId){
 
@@ -1469,19 +1412,17 @@
 							//commit sublist line item
 							cmRecord.commitLine({sublistId: 'item'});
 							cmFlag = true;
-                            cmStandFlag = true;
 
 						}//End itemId condition
 
 					}//End for loop
-					//log.debug('cmFlag in CM : ',cmFlag);
+					log.debug('cmFlag in CM : ',cmFlag);
 
 				}
 
 				if(cmFlag==true){
 
 					if(tranDate){
-                        log.debug('tranDate in CM : ',tranDate);
 						cmRecord.setValue({fieldId:'trandate',value:tranDate});
                         cmRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
 					}
@@ -1514,8 +1455,6 @@
                   	cmRecord.setValue({fieldId:'custbody_cl_ns_invoice_id',value:invId});
                     cmRecord.setText({fieldId:'cseg_ch_payer',text:btPaymentType});
 
-                    cmRecord.setValue({fieldId:'custbody_sfdc_bt_internal_id',value:btId});
-
 					//save credit memo record
 					var cmRecId = cmRecord.save({enableSourcing: true, ignoreMandatoryFields: true});
 					log.debug('Successfully Created Credit Memo record id is : ',cmRecId);
@@ -1524,22 +1463,20 @@
 					if(cmRecId > 0){
 
 						for(var x=0; x < cmLineItemArr.length; x++){
-							if(cmItemIdArr.indexOf(cmLineItemArr[x].itemId)!=-1 || cmItemIdArr.indexOf(cmLineItemArr[x].arItemId)!=-1 || cmStandFlag == true){
-								var fldId = record.submitFields({
-									type: 'customrecord_ch_bt_staging',
-									id: parseInt(cmLineItemArr[x].btId),
-									values: {
-										custrecord_ch_bt_associated_inv: cmRecId,
-										custrecord_ch_bt_processed: true,
-										custrecord_ch_bt_dateprocessed: currDate,
-										custrecord_ch_bt_exception: ""
-									},
-									options: {
-										enableSourcing: false,
-										ignoreMandatoryFields : true
-									}
-								});
-							}
+							var fldId = record.submitFields({
+								type: 'customrecord_ch_bt_staging',
+								id: parseInt(cmLineItemArr[x].btId),
+								values: {
+									custrecord_ch_bt_associated_inv: cmRecId,
+									custrecord_ch_bt_processed: true,
+									custrecord_ch_bt_dateprocessed: currDate,
+									custrecord_ch_bt_exception: ""
+								},
+								options: {
+									enableSourcing: false,
+									ignoreMandatoryFields : true
+								}
+							});
 						}//End for loop
 
 						//flag = true;
@@ -1576,7 +1513,7 @@
 				//Start Standalone Credit Memo
 				log.debug('Start Stand Alone Credit Memo');
 
-                //log.debug('standalone cmLineItemArr : ',cmLineItemArr);
+                log.debug('standalone cmLineItemArr : ',cmLineItemArr);
                 var cmFlag = false, flag = false;
                 var itemQtyObj  = new Object();
 
@@ -1585,7 +1522,7 @@
 					//Create standalone Credit memo
 					for(var u=0; u < cmLineItemArr.length; u++){
 						 var itemN = cmLineItemArr[u].itemName;
-                         //log.debug('itemN && AR itemId : ',itemN +' && '+ arItemObj[itemN]);
+                          //log.debug('itemN && AR itemId : ',itemN +' && '+ arItemObj[itemN]);
 						 cmLineItemArr[u].itemId = arItemObj[itemN];
 					}
 				}
@@ -1593,7 +1530,7 @@
 
                 var tranDate	= customData.tranDate;
               	var dateOfService	= customData.dateOfService;
-                var btTranType	= cmLineItemArr[0].btTranType;//customData.btTranType;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
               	var btOrderId	= customData.btOrderId;
                 var patientKey	= customData.patientKey;
@@ -1614,7 +1551,7 @@
                 var btInvCreatedDate = customData.btInvCreatedDate;
               
 				var customer	= GetCustomerByPatientId(patientId);
-				//log.debug('customer in stand alone CM : ',customer);
+				log.debug('customer in stand alone CM : ',customer);
 
 				//Create credit memo record
 				var cmRecord = record.create({
@@ -1625,7 +1562,7 @@
 					}
 				});
 
-				//log.debug('stand alone cmLineItemArr.length : ',cmLineItemArr.length);
+				log.debug('stand alone cmLineItemArr.length : ',cmLineItemArr.length);
 
 				for(var p=0; p < cmLineItemArr.length; p++){
 
@@ -1637,7 +1574,7 @@
 					//log.debug('itemAmt : ',itemAmt);
 
 					var itemId  = cmLineItemArr[p].itemId;
-					//log.debug('itemId : ',itemId);
+					log.debug('itemId : ',itemId);
 
 					if(itemId){
 
@@ -1668,12 +1605,11 @@
 					}//End itemId condition
 
 				}//End for loop
-				//log.debug('cmFlag in CM : ',cmFlag);
+				log.debug('cmFlag in CM : ',cmFlag);
 				
 				if(cmFlag==true){
 
 					if(tranDate){
-                        log.debug('tranDate in standalon CM : ',tranDate);
 						cmRecord.setValue({fieldId:'trandate',value:tranDate});
                         cmRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
 					}
@@ -1704,7 +1640,6 @@
 					cmRecord.setValue({fieldId:'custbody_ch_inv_zip',value:btZipCode});
 
                     cmRecord.setText({fieldId:'cseg_ch_payer',text:btPaymentType});
-                    cmRecord.setValue({fieldId:'custbody_sfdc_bt_internal_id',value:btId});
 
 					//cmRecord.setValue({fieldId:'custbody_cl_ns_invoice_id',value:invId});
 
@@ -1763,13 +1698,10 @@
                 log.debug('Start Invoice');
                 log.debug('lineItemArr : ',lineItemArr);
                 var invFlag = false, invItemIdArr = [];
-                //var soInvLinkingItemId = '5045';
-                var soInvLinkingItemId = customData.soInvLinkingItemId;
-                log.debug('INV soInvLinkingItemId : ',soInvLinkingItemId);
 
                 var tranDate	= customData.tranDate;
-              	var dateOfService= customData.dateOfService;
-                var btTranType	= lineItemArr[0].btTranType;//customData.btTranType;
+              	var dateOfService	= customData.dateOfService;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
               	var btOrderId	= customData.btOrderId;//
                 var patientKey	= customData.patientKey;
@@ -1800,11 +1732,11 @@
                                         columns: ['total']
                                     });
                 var soAmt		=	fieldLookUp.total;
-                //log.debug('soAmt : ',soAmt);
+                log.debug('soAmt : ',soAmt);
 
                 //Get Item sublist Line count of an invoice
                 var invLineCount = invRecord.getLineCount({sublistId: 'item'});
-                //log.debug('invLineCount : ',invLineCount);
+                log.debug('invLineCount : ',invLineCount);
 
                 //Loop through all lines to set received item of an invoice
                 for(var p=invLineCount-1; p > -1; p--){
@@ -1835,14 +1767,14 @@
                         }else if(lineData[0].arFlag==true){
 							var arLineQty = parseFloat(itemAmt)/parseFloat(soAmt);
                           	arLineQty = parseFloat(arLineQty).toFixed(2);
-                          	//log.debug('arLineQty in invoice : ',arLineQty);
+                          	log.debug('arLineQty in invoice : ',arLineQty);
                             invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: arLineQty,ignoreFieldChange: false});
                         }else{
                             invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: lineData[0].itemQty,ignoreFieldChange: false});
                         }
                         //invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: lineData[0].itemQty,ignoreFieldChange: false});
                         invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'rate',value: lineData[0].itemRate,ignoreFieldChange: false});
-                        invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'amount',value: Math.abs(itemAmt),ignoreFieldChange: true});
+                        invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'amount',value: itemAmt,ignoreFieldChange: true});
                         invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'description',value: lineData[0].itemDesc,ignoreFieldChange: true});
                         invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_internal_id',value: lineData[0].btId,ignoreFieldChange: true});
                         invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_ext_id',value: lineData[0].btExtId,ignoreFieldChange: true});
@@ -1858,71 +1790,29 @@
                         invFlag = true;
                         invItemIdArr.push(itemId);
                     }else{
-                        if(itemId==soInvLinkingItemId){
-                           invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: 1,ignoreFieldChange: false});
-                           //commit sublist line item
-                           invRecord.commitLine({sublistId: 'item'});
-                           invFlag = true;
-                        }else{
-                           log.debug('remove line no :',p);
-                           invRecord.removeLine({sublistId: 'item',line: p,ignoreRecalc: false});
-                        }
+                        log.debug('remove line no :',p);
+                        invRecord.removeLine({sublistId: 'item',line: p,ignoreRecalc: false});
                     }
 
                 }//End for loop of line item
-                //log.debug('invFlag : ',invFlag);
+                log.debug('invFlag : ',invFlag);
               	var newInvLineCount = invRecord.getLineCount({sublistId: 'item'});
                 log.debug('newInvLineCount : ',newInvLineCount);
-                if(newInvLineCount==1){
-					var newItemId 	= invRecord.getSublistValue({sublistId: 'item',fieldId: 'item',line:0});
-                    log.debug('newItemId : ',newItemId);
-					if(newItemId==soInvLinkingItemId){
-						for(var t=0; t<lineItemArr.length; t++){
-							//Select New Line
-							var newItemId = lineItemArr[t].arItemId==""?lineItemArr[t].itemId : lineItemArr[t].arItemId;
-							log.debug('newItemId : ',newItemId);
-							invRecord.selectNewLine({sublistId: 'item'});
-							//invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'item',value: lineItemArr[t].arItemId,ignoreFieldChange: false});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'item',value: newItemId,ignoreFieldChange: false});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'quantity',value: lineItemArr[t].itemQty,ignoreFieldChange: false});
-							//invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'rate',value: lineItemArr[t].itemRate,ignoreFieldChange: false});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'amount',value: Math.abs(lineItemArr[t].itemAmt),ignoreFieldChange: true});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'description',value: lineItemArr[t].itemDesc,ignoreFieldChange: true});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_internal_id',value: lineItemArr[t].btId,ignoreFieldChange: true});
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_sfdc_bt_ext_id',value: lineItemArr[t].btExtId,ignoreFieldChange: true});
-
-							invRecord.setCurrentSublistText({sublistId: 'item',fieldId: 'cseg_ch_payer',text: lineItemArr[t].btPaymentType,ignoreFieldChange: true});
-							if(tranDate){
-								invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_bt_tran_date_col',value: tranDate,ignoreFieldChange: true});//
-							}
-							invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'custcol_ch_tran_type_line',value: btTranType,ignoreFieldChange: true});//
-
-							//commit sublist line item
-							invRecord.commitLine({sublistId: 'item'});
-							invItemIdArr.push(lineItemArr[t].arItemId);
-							invFlag = true;
-						}
-					
-					}
-                }
 
                 if(invFlag==true){
                   	var itemN = invRecord.getSublistText({sublistId: 'item',fieldId: 'item',line:0});
                   	var itemAmt1 = invRecord.getSublistValue({sublistId: 'item',fieldId: 'amount',line:0});
                   	var itemQty1 = invRecord.getSublistValue({sublistId: 'item',fieldId: 'quantity',line:0});
                   	var invTotal1= invRecord.getValue({fieldId:'total'});
-                  	//log.debug('itemN & itemAmt1 & invTotal1 & itemQty1 : ',itemN+' & '+itemAmt1+' & '+invTotal1+' & '+itemQty1);
+                  	log.debug('itemN & itemAmt1 & invTotal1 & itemQty1 : ',itemN+' & '+itemAmt1+' & '+invTotal1+' & '+itemQty1);
 
                     if(btInvCreatedDate){
                         invRecord.setValue({fieldId:'trandate',value:btInvCreatedDate});
                     }
                     else if(tranDate){
                         invRecord.setValue({fieldId:'trandate',value:tranDate});
-                        //invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
+                        invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
                     }
-                    if(tranDate){
-						invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
-					}
                   	if(dateOfService){
 						invRecord.setValue({fieldId:'custbody_ch_date_of_service',value:dateOfService});
 					}
@@ -1956,9 +1846,9 @@
                     var currDate = new Date();
 
                     for(var x=0; x < lineItemArr.length; x++){
-                        //log.debug('invItemIdArr : ',invItemIdArr);
-						//log.debug('lineItemArr[x].itemId : '+x,lineItemArr[x].itemId);
-						if(invItemIdArr.indexOf(lineItemArr[x].itemId)!=-1 || invItemIdArr.indexOf(lineItemArr[x].arItemId)!=-1){
+                        log.debug('invItemIdArr : ',invItemIdArr);
+						log.debug('lineItemArr[x].itemId : '+x,lineItemArr[x].itemId);
+						if(invItemIdArr.indexOf(lineItemArr[x].itemId)!=-1){
 							var fldId = record.submitFields({
 								type: 'customrecord_ch_bt_staging',
 								id: parseInt(lineItemArr[x].btId),
@@ -2029,7 +1919,7 @@
 
                 var tranDate	= customData.tranDate;
               	var dateOfService	= customData.dateOfService;
-                var btTranType	= invLineItemArr[0].btTranType;//customData.btTranType;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
               	var btOrderId	= customData.btOrderId;//
                 var patientKey	= customData.patientKey;
@@ -2048,7 +1938,7 @@
               	//var itemObj		= customData.itemObj;
 
 				var customer	= GetCustomerByPatientId(patientId);
-				//log.debug('customer : ',customer);
+				log.debug('customer : ',customer);
 
                 //Create invoice record
 				var invRecord = record.create({
@@ -2059,7 +1949,7 @@
 					}
                 });
 
-				//log.debug('invLineItemArr.length : ',invLineItemArr.length);
+				log.debug('invLineItemArr.length : ',invLineItemArr.length);
 
 				for(var p=0; p < invLineItemArr.length; p++){
 
@@ -2073,9 +1963,9 @@
                     //}
 					//log.debug('itemAmt : ',itemAmt);
 
-                  	//log.debug('invLineItemArr[p].itemName : ',invLineItemArr[p].itemName);
+                  	log.debug('invLineItemArr[p].itemName : ',invLineItemArr[p].itemName);
                   	var itemId  = invLineItemArr[p].itemId; //itemObj[invLineItemArr[p].itemName];
-					//log.debug('itemId : ',itemId);
+					log.debug('itemId : ',itemId);
 
                   	invRecord.setCurrentSublistValue({sublistId: 'item',fieldId: 'item',value: itemId,ignoreFieldChange: false});
 
@@ -2103,7 +1993,7 @@
 					invFlag = true;
 
 				}//End for loop
-				//log.debug('invFlag : ',invFlag);
+				log.debug('invFlag : ',invFlag);
 
 				if(invFlag==true){
 
@@ -2112,9 +2002,6 @@
                     }
                     else if(tranDate){
                         invRecord.setValue({fieldId:'trandate',value:tranDate});
-                        //invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
-                    }
-                    if(tranDate){
                         invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
                     }
                   	if(dateOfService){
@@ -2196,7 +2083,7 @@
 
                 var tranDate	= customData.tranDate;
               	var dateOfService	= customData.dateOfService;
-                var btTranType	= lineItemArr[0].btTranType;//customData.btTranType;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
               	var btOrderId	= customData.btOrderId;//
                 var patientKey	= customData.patientKey;
@@ -2225,7 +2112,7 @@
                 */
 
               	var customer		= GetCustomerByPatientId(patientId);
-				//log.debug('customer : ',customer);
+				log.debug('customer : ',customer);
 				var invLoc			= '8';
 
                 var invRecord = record.create({
@@ -2240,7 +2127,7 @@
 
                 //Get Item sublist Line count of an invoice
                 var invLineCount= invRecord.getLineCount({sublistId: 'item'});
-                //log.debug('invLineCount in BL : ',invLineCount);
+                log.debug('invLineCount in BL : ',invLineCount);
 
                 for(var x=0; x < lineItemArr.length; x++){
 
@@ -2386,19 +2273,16 @@
                     flag = true;
 
                 }//End line item for loop
-                //log.debug('stand alone inv flag : ',flag);
+                log.debug('stand alone inv flag : ',flag);
 
                 if(flag==true){
 
-                    //log.debug('btInvCreatedDate & tranDate & dateOfService & btPaymentDate : ',btInvCreatedDate +' & '+tranDate +' & '+dateOfService +' & '+btPaymentDate);
+                    log.debug('btInvCreatedDate & tranDate & dateOfService & btPaymentDate : ',btInvCreatedDate +' & '+tranDate +' & '+dateOfService +' & '+btPaymentDate);
                     if(btInvCreatedDate){
                         invRecord.setValue({fieldId:'trandate',value:btInvCreatedDate});
                     }
                     else if(tranDate){
                         invRecord.setValue({fieldId:'trandate',value:tranDate});
-                        //invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
-                    }
-                    if(tranDate){
                         invRecord.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
                     }
                   	if(dateOfService){
@@ -2489,7 +2373,7 @@
 
                 var tranDate	= customData.tranDate;
               	var dateOfService	= customData.dateOfService;
-                var btTranType	= paymentDataArr[0].btTranType;//customData.btTranType;
+                var btTranType	= customData.btTranType;
                 var btTranNo	= customData.btTranNo;
                 var patientKey	= customData.patientKey;
                 var patientId	= customData.patientId;
@@ -2516,12 +2400,12 @@
                 */
 
               	var customer		= GetCustomerByPatientId(patientId);
-				//log.debug('customer : ',customer);
+				log.debug('customer : ',customer);
 
                 for(var x=0; x < paymentDataArr.length; x++){
 
                     var btInvTranNo = String(paymentDataArr[x].btAppliedToFrom);
-                    //log.debug('btInvTranNo : ',btInvTranNo);
+                    log.debug('btInvTranNo : ',btInvTranNo);
                     var myFilter 	= ["custbody_ch_bt_tran_id_invoice","is",btInvTranNo];
                     subBTInvFilterArr.push(myFilter);
                     subBTInvFilterArr.push("OR");
@@ -2548,7 +2432,7 @@
                 });
 
                 var lineCount = customerPaymentObj.getLineCount({sublistId: 'apply'});
-                //log.debug('lineCount cp : ',lineCount);
+                log.debug('lineCount cp : ',lineCount);
 
                 customerPaymentObj.setValue({fieldId:'payment',value:parseFloat(btApplAmt)});
 
@@ -2573,7 +2457,7 @@
                             sublistId: 'apply',
                             fieldId: 'due'
                         });
-                        //log.debug('dueAmt && btApplAmt : ',dueAmt +' && '+btApplAmt);
+                        log.debug('dueAmt && btApplAmt : ',dueAmt +' && '+btApplAmt);
 
                         //Set Line level Loop Return Item
                         customerPaymentObj.setCurrentSublistValue({
@@ -2597,14 +2481,14 @@
                             sublistId: 'apply',
                             fieldId: 'amount'
                         });
-                        //log.debug('applyAmt : ',applyAmt);
+                        log.debug('applyAmt : ',applyAmt);
 
                         matchInvFlag = true;
                     }
 
                 //}//End inv for loop
 
-                //log.debug('matchInvFlag : ',matchInvFlag);
+                log.debug('matchInvFlag : ',matchInvFlag);
 
                 if(matchInvFlag==true){
 
@@ -2612,14 +2496,11 @@
                         customerPaymentObj.setValue({fieldId:'trandate',value:btPaymentDate});
                     }else if(tranDate){
                         customerPaymentObj.setValue({fieldId:'trandate',value:tranDate});
-                        //customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
+                        customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
                     }
                   	if(dateOfService){
 						customerPaymentObj.setValue({fieldId:'custbody_ch_date_of_service',value:dateOfService});
 					}
-                    if(tranDate){
-                        customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
-                    }
                     if(btPaymentDate){
 						customerPaymentObj.setValue({fieldId:'custbody_cala_bt_payment_date',value:btPaymentDate});
 					}
@@ -2661,7 +2542,7 @@
                                 ignoreMandatoryFields : true
                             }
                         });
-                        //log.debug('paymentBTId : ',paymentBTId);
+                        log.debug('paymentBTId : ',paymentBTId);
                     }//End for loop
                 }else if(matchInvFlag==false){
                     CreateUnAppliedCustomerPayment(patientId,customData,paymentDataArr);
@@ -2693,7 +2574,7 @@
 			var btExtId		= paymentDataArr[0].btExtId;
 			var tranDate	= customData.tranDate;
           	var dateOfService= customData.dateOfService;
-          	var btTranType	= paymentDataArr[0].btTranType;//customData.btTranType;
+          	var btTranType	= customData.btTranType;
           	var btTranNo	= customData.btTranNo;
           	var patientKey	= customData.patientKey;
 			var patientName	= customData.patientName;
@@ -2709,7 +2590,7 @@
             var btId        = paymentDataArr[0].btId;
 
           	var customer	= GetCustomerByPatientId(patientId);
-          	//log.debug('customer : ',customer);
+          	log.debug('customer : ',customer);
 
 			//Create Customer Payment
 			var customerPaymentObj = record.create({
@@ -2721,7 +2602,7 @@
 			});
 
 			var lineCount = customerPaymentObj.getLineCount({sublistId: 'apply'});
-			//log.debug('lineCount cp unapplied : ',lineCount);
+			log.debug('lineCount cp unapplied : ',lineCount);
 
           	customerPaymentObj.setValue({fieldId:'payment',value:parseFloat(btApplAmt)});
             if(btPaymentDate){
@@ -2729,10 +2610,7 @@
             }
 			else if(tranDate){
               	customerPaymentObj.setValue({fieldId:'trandate',value:tranDate});
-                //customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
-            }
-            if(tranDate){
-              	customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
+                customerPaymentObj.setValue({fieldId:'custbody_ch_bt_transaction_date',value:tranDate});
             }
           	if(dateOfService){
 				customerPaymentObj.setValue({fieldId:'custbody_ch_date_of_service',value:dateOfService});
@@ -2777,7 +2655,7 @@
                         ignoreMandatoryFields : true
                       }
               });
-              //log.debug('paymentBTId : ',paymentBTId);
+              log.debug('paymentBTId : ',paymentBTId);
             }//End for loop
 
         }
@@ -2814,13 +2692,13 @@
                 log.debug('customer : ',customer);
                 */
               	var customer	= GetCustomerByPatientId(patientId);
-				//log.debug('customer in refund : ',customer);
+				log.debug('customer in refund : ',customer);
 
                 var applyId		= 	GetCreditMemoByBTTranNo(btAppliedToFrom);
                 if(applyId == 0){
                     applyId 	= 	GetCustomerPaymentByBTTranNo(btAppliedToFrom);
                 }
-                //log.debug('applyId in refund : ',applyId);
+                log.debug('applyId in refund : ',applyId);
 
                 //Create Customer Refund
                 var customerRefObj = record.create({
@@ -2832,7 +2710,7 @@
                 });
 
                 var lineCount = customerRefObj.getLineCount({sublistId: 'apply'});
-                //log.debug('lineCount cr : ',lineCount);
+                log.debug('lineCount cr : ',lineCount);
 
                 //customerRefObj.setValue({fieldId:'payment',value:parseFloat(btApplAmt)});
 
@@ -2855,7 +2733,7 @@
                         sublistId: 'apply',
                         fieldId: 'due'
                     });
-                    //log.debug('dueAmt && btApplAmt : ',dueAmt +' && '+btApplAmt);
+                    log.debug('dueAmt && btApplAmt : ',dueAmt +' && '+btApplAmt);
 
                     //Set Line level Loop Return Item
                     customerRefObj.setCurrentSublistValue({
@@ -2879,12 +2757,12 @@
                         sublistId: 'apply',
                         fieldId: 'amount'
                     });
-                    //log.debug('applyAmt : ',applyAmt);
+                    log.debug('applyAmt : ',applyAmt);
 
                     matchCMFlag = true;
                 }
 
-                //log.debug('matchCMFlag : ',matchCMFlag);
+                log.debug('matchCMFlag : ',matchCMFlag);
 
                 if(matchCMFlag==true){
                     if(tranDate){
